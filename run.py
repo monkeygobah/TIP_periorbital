@@ -40,20 +40,22 @@ def run(args: DictConfig):
     ckpt = torch.load(args.checkpoint)
     args = ckpt['hyper_parameters']
     args = OmegaConf.create(args)
+
     #with open_dict(args):
     args.checkpoint = checkpoint
     args.resume_training = True
     if not 'wandb_id' in args or not args.wandb_id:
       args.wandb_id = wandb_id
+
     # Run prepend again in case we move to another server and need to redo the paths
     args.data_base = tmp_data_base
     args = re_prepend_paths(args)
   
-  if args.generate_embeddings:
-    if not args.datatype:
-      args.datatype = grab_arg_from_checkpoint(args, 'dataset')
-    generate_embeddings(args)
-    return args
+  # if args.generate_embeddings:
+  #   if not args.datatype:
+  #     args.datatype = grab_arg_from_checkpoint(args, 'dataset')
+  #   generate_embeddings(args)
+  #   return args
   
   base_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
   base_dir = os.path.join(os.path.dirname(os.path.dirname(base_dir)), 'result')
@@ -76,6 +78,7 @@ def run(args: DictConfig):
   print(f'Pretrain LR: {args.lr}, Decay: {args.weight_decay}')
   print(f'Finetune LR: {args.lr_eval}, Decay: {args.weight_decay_eval}')
   print(f'Corruption rate: {args.corruption_rate}, temperature: {args.temperature}')
+  
   if args.algorithm_name == 'TIP':
     print('Special Replace Ratio: ', args.replace_special_rate)
     
